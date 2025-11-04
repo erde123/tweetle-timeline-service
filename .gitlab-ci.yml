@@ -1,0 +1,47 @@
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+stages:
+  - build
+  - test
+  - sonarqube-check
+  - deploy
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+
+test:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./gradlew test
+
+sonarqube-check:
+  stage: sonarqube-check
+  script:
+    - ./gradlew test jacocoTestReport sonar
+
+docker-deploy:
+  stage: deploy
+  script:
+    # Stop and remove any existing containers
+    - docker compose down || true
+
+    # Ensure the Docker network exists (optional, if already defined in compose)
+    - docker network inspect tweetle-network || docker network create tweetle-network
+
+    # Build and start all services in detached mode
+    - docker compose up -d --build
+
+    # Optionally check container status
+    - docker ps
+  only:
+    - main
+  dependencies:
+    - build
