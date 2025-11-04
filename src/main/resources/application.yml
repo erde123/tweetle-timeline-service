@@ -1,1 +1,29 @@
-spring.application.name=tweetle-timeline-service
+server:
+  port: 8005
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+spring:
+  application:
+    name: tweetle-timeline-service
+  security:
+    oauth2:
+      resource server:
+        jwt:
+          issuer-uri: https://dev-vkjc2qc55bwr1ikt.eu.auth0.com/
+          audiences: https://tweetle/api
+
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27018/timelineservice?authSource=admin
+      database: timelinedb
+      username: admin
+      password: password
+      auto-index-creation: true

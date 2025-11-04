@@ -1,0 +1,23 @@
+server:
+  port: 8005
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+spring:
+  application:
+    name: tweetle-timeline-service
+
+  data:
+    mongodb:
+      uri: mongodb://admin:password@timeline-mongo:27017/timelinedb?authSource=admin
+      database: tweetdb
+      username: admin
+      password: password
+      auto-index-creation: true
