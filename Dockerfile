@@ -1,4 +1,11 @@
-FROM ubuntu:latest
-LABEL authors="ryan"
+FROM gradle:8.8-jdk21
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /opt/app
+
+EXPOSE 8005
+
+COPY build/libs/tweetle-timeline-service-0.0.1-SNAPSHOT.jar ./
+
+ENV SPRING_PROFILES_ACTIVE=docker
+
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar tweetle-timeline-service-0.0.1-SNAPSHOT.jar"]

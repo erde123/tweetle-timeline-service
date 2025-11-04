@@ -1,0 +1,44 @@
+version: '3'
+services:
+
+  timeline-mongo:
+    image: mongo:latest
+    container_name: timeline-mongo
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: timelinedb
+    volumes:
+      - timeline-mongo-data:/data/db
+    networks:
+      - tweetle-network
+
+  timeline-service:
+    build: .
+    restart: on-failure
+    container_name: timeline-api
+    ports:
+      - "8005:8005"
+    depends_on:
+      - timeline-mongo
+    environment:
+      SPRING_APPLICATION_NAME: tweetle-timeline-service
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@timeline-mongo:27017/timelinedb?authSource=admin
+      SPRING_DATA_MONGODB_DATABASE: timelinedb
+      SERVER_PORT: 8005
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://dev-vkjc2qc55bwr1ikt.eu.auth0.com/
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: https://tweetle/api
+    networks:
+      - tweetle-network
+
+volumes:
+  timeline-mongo-data:
+
+networks:
+  tweetle-network:
+    external: true
