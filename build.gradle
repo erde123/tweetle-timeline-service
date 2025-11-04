@@ -53,6 +53,14 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
+sonar {
+    properties {
+        property "sonar.projectKey", "I556050_tweetle-timeline-project_f30ce2f2-3cef-4c87-9363-17c060463de8"
+        property "sonar.projectName", "Tweetle Timeline Project"
+        property "sonar.qualitygate.wait", true
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
