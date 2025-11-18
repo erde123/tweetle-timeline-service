@@ -16,8 +16,18 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://admin:password@timeline-mongo:27017/timelinedb?authSource=admin
-      database: tweetdb
+      uri: mongodb://admin:password@timeline-mongo:27018/timelinedb?authSource=admin
+      database: timelinedb
       username: admin
       password: password
       auto-index-creation: true
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin
+
+rabbitmq:
+  exchange:
+    name: tweetle.exchange
