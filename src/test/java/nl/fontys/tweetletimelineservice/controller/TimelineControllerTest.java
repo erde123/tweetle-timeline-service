@@ -1,5 +1,7 @@
 package nl.fontys.tweetletimelineservice.controller;
 
+import nl.fontys.tweetletimelineservice.business.dto.TimelineResponse;
+import nl.fontys.tweetletimelineservice.business.dto.TimelineTweetDto;
 import nl.fontys.tweetletimelineservice.business.service.TimelineService;
 import nl.fontys.tweetletimelineservice.persistence.document.Timeline;
 import nl.fontys.tweetletimelineservice.persistence.document.Timeline.TweetRef;
@@ -14,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,6 +30,7 @@ class TimelineControllerTest {
     private TimelineController timelineController;
 
     private Timeline testTimeline;
+    private TimelineResponse timelineResponse;
 
     @BeforeEach
     void setUp() {
@@ -38,28 +41,22 @@ class TimelineControllerTest {
                         TweetRef.builder().tweetId("tweet123").authorId(200L).createdAt(System.currentTimeMillis()).build()
                 ))
                 .build();
+
+        timelineResponse = new TimelineResponse(
+                100L,
+                List.of(new TimelineTweetDto("tweet123", 200L, "tester", "avatar.png", "hello world", System.currentTimeMillis()))
+        );
     }
 
     @Test
-    void getTimeline_WhenExists_ShouldReturnTimeline() {
-        when(timelineService.getTimeline(100L)).thenReturn(testTimeline);
+    void getTimeline_ShouldReturnResponse() {
+        when(timelineService.getTimelineResponse(100L)).thenReturn(timelineResponse);
 
-        ResponseEntity<Timeline> response = timelineController.getTimeline(100L);
+        ResponseEntity<TimelineResponse> response = timelineController.getTimeline(100L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testTimeline, response.getBody());
-        verify(timelineService, times(1)).getTimeline(100L);
-    }
-
-    @Test
-    void getTimeline_WhenNotFound_ShouldReturn404() {
-        when(timelineService.getTimeline(999L)).thenReturn(null);
-
-        ResponseEntity<Timeline> response = timelineController.getTimeline(999L);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(timelineService, times(1)).getTimeline(999L);
+        assertEquals(timelineResponse, response.getBody());
+        verify(timelineService, times(1)).getTimelineResponse(100L);
     }
 
     @Test

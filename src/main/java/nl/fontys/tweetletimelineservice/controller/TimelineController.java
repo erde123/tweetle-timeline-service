@@ -1,6 +1,7 @@
 package nl.fontys.tweetletimelineservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import nl.fontys.tweetletimelineservice.business.dto.TimelineResponse;
 import nl.fontys.tweetletimelineservice.business.service.TimelineService;
 import nl.fontys.tweetletimelineservice.persistence.document.Timeline;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,8 @@ public class TimelineController {
     private TimelineService timelineService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Timeline> getTimeline(@PathVariable Long userId) {
-        Timeline timeline = timelineService.getTimeline(userId);
-        return (timeline == null)
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(timeline);
+    public ResponseEntity<TimelineResponse> getTimeline(@PathVariable Long userId) {
+        return ResponseEntity.ok(timelineService.getTimelineResponse(userId));
     }
 
     @PostMapping("/{userId}/tweet/{tweetId}/author/{authorId}")
@@ -38,4 +36,3 @@ public class TimelineController {
         return ResponseEntity.noContent().build();
     }
 }
-

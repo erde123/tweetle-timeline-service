@@ -2,6 +2,7 @@ package nl.fontys.tweetletimelineservice.business.service;
 
 import nl.fontys.tweetletimelineservice.persistence.document.Timeline;
 import nl.fontys.tweetletimelineservice.persistence.document.Timeline.TweetRef;
+import nl.fontys.tweetletimelineservice.persistence.repository.FollowRepository;
 import nl.fontys.tweetletimelineservice.persistence.repository.TimelineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,15 @@ class TimelineServiceTest {
 
     @Mock
     private TimelineRepository timelineRepository;
+
+    @Mock
+    private FollowRepository followRepository;
+
+    @Mock
+    private TweetMetadataService tweetMetadataService;
+
+    @Mock
+    private UserMetadataService userMetadataService;
 
     @InjectMocks
     private TimelineService timelineService;
