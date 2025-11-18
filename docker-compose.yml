@@ -26,7 +26,7 @@ services:
       - timeline-mongo
     environment:
       SPRING_APPLICATION_NAME: tweetle-timeline-service
-      SPRING_DATA_MONGODB_URI: mongodb://admin:password@timeline-mongo:27017/timelinedb?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@timeline-mongo:27018/timelinedb?authSource=admin
       SPRING_DATA_MONGODB_DATABASE: timelinedb
       SERVER_PORT: 8005
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
