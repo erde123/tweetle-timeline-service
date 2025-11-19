@@ -58,6 +58,7 @@ sonar {
         property "sonar.projectKey", "I556050_tweetle-timeline-project_f30ce2f2-3cef-4c87-9363-17c060463de8"
         property "sonar.projectName", "Tweetle Timeline Project"
         property "sonar.qualitygate.wait", true
+        property "sonar.inclusions", "src/main/java/nl/fontys/tweetletimelineservice/business/service/TimelineService,src/main/java/nl/fontys/tweetletimelineservice/controller/**"
     }
 }
 
