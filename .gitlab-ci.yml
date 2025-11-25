@@ -39,7 +39,7 @@ zap-security-scan:
     - echo "Waiting for Spring Boot to start..."
     - sleep 25
 
-    - export TARGET_URL="http://host.docker.internal:8005"
+    - export TARGET_URL="http://timeline-api:8005"
 
     - mkdir -p zap-reports
 
