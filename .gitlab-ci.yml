@@ -37,7 +37,15 @@ zap-security-scan:
     - docker compose up -d --build
 
     - echo "Waiting for Spring Boot to start..."
-    - sleep 25
+    - echo "Waiting for API to start..."
+    - for i in {1..60}; do
+      if docker run --rm --network=tweetle-network curlimages/curl http://timeline-api:8005 -s > /dev/null; then
+      echo "API is up!";
+      break;
+      fi;
+      echo "API not ready ($i)...";
+      sleep 2;
+      done
 
     - export TARGET_URL="http://timeline-api:8005"
 
