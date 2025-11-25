@@ -1,11 +1,22 @@
-eureka:
-  client:
-    enabled: false
-
 spring:
+  data:
+    mongodb:
+      auto-index-creation: true
   rabbitmq:
     listener:
       simple:
         auto-startup: false
-      direct:
-        auto-startup: false
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
