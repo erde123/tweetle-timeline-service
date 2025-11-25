@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class TimelineService {
@@ -36,15 +38,7 @@ public class TimelineService {
     private UserMetadataService userMetadataService;
 
     public Timeline getTimeline(Long userId) {
-        Timeline timeline = timelineRepository.findByUserId(userId);
-        if (timeline == null) {
-            timeline = Timeline.builder()
-                    .userId(userId)
-                    .tweets(new ArrayList<>())
-                    .build();
-            timeline = timelineRepository.save(timeline);
-        }
-        return timeline;
+        return loadOrCreateTimeline(userId);
     }
 
     public TimelineResponse getTimelineResponse(Long userId) {
@@ -122,13 +116,7 @@ public class TimelineService {
 
     private void addTweetToTimelineInternal(Long userId, String tweetId, Long authorId, long createdAt) {
 
-        Timeline timeline = timelineRepository.findByUserId(userId);
-        if (timeline == null) {
-            timeline = Timeline.builder()
-                    .userId(userId)
-                    .tweets(new ArrayList<>())
-                    .build();
-        }
+        Timeline timeline = loadOrCreateTimeline(userId);
 
         Timeline.TweetRef tweetRef = Timeline.TweetRef.builder()
                 .tweetId(tweetId)
@@ -146,14 +134,7 @@ public class TimelineService {
     }
 
     public Timeline addTweetToTimeline(Long userId, String tweetId, Long authorId) {
-        Timeline timeline = timelineRepository.findByUserId(userId);
-
-        if (timeline == null) {
-            timeline = Timeline.builder()
-                    .userId(userId)
-                    .tweets(new ArrayList<>())
-                    .build();
-        }
+        Timeline timeline = loadOrCreateTimeline(userId);
 
         Timeline.TweetRef tweetRef = Timeline.TweetRef.builder()
                 .tweetId(tweetId)
@@ -180,5 +161,49 @@ public class TimelineService {
                 metadata.getContent(),
                 metadata.getCreatedAt()
         );
+    }
+
+    private Timeline loadOrCreateTimeline(Long userId) {
+        Objects.requireNonNull(userId, "userId must not be null when loading timeline");
+        List<Timeline> timelines = timelineRepository.findAllByUserId(userId);
+
+        if (timelines.isEmpty()) {
+            return timelineRepository.save(
+                    Timeline.builder()
+                            .userId(userId)
+                            .tweets(new ArrayList<>())
+                            .build()
+            );
+        }
+
+        Timeline primary = timelines.get(0);
+        if (primary.getTweets() == null) {
+            primary.setTweets(new ArrayList<>());
+        }
+
+        // Merge tweets from duplicate timelines (if any) and deduplicate by tweetId
+        List<Timeline.TweetRef> mergedTweets = new ArrayList<>(primary.getTweets());
+        Set<String> seenTweetIds = new HashSet<>();
+        mergedTweets.removeIf(ref -> !seenTweetIds.add(ref.getTweetId()));
+
+        for (int i = 1; i < timelines.size(); i++) {
+            Timeline extra = timelines.get(i);
+            if (extra.getTweets() != null) {
+                for (Timeline.TweetRef ref : extra.getTweets()) {
+                    if (seenTweetIds.add(ref.getTweetId())) {
+                        mergedTweets.add(ref);
+                    }
+                }
+            }
+            timelineRepository.delete(extra);
+        }
+
+        mergedTweets.sort(Comparator.comparingLong(Timeline.TweetRef::getCreatedAt).reversed());
+        if (mergedTweets.size() > MAX_TIMELINE_TWEETS) {
+            mergedTweets = new ArrayList<>(mergedTweets.subList(0, MAX_TIMELINE_TWEETS));
+        }
+
+        primary.setTweets(mergedTweets);
+        return timelineRepository.save(primary);
     }
 }

@@ -1,6 +1,7 @@
 package nl.fontys.tweetletimelineservice.persistence.document;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -18,6 +19,8 @@ import lombok.NoArgsConstructor;
 public class Timeline {
     @Id
     private String id;
+
+    @Indexed(unique = true)
     private Long userId;
     private List<TweetRef> tweets;
 
@@ -31,4 +34,3 @@ public class Timeline {
         private long createdAt;
     }
 }
-

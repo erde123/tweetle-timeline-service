@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface TimelineRepository extends MongoRepository<Timeline, String> {
     Timeline findByUserId(Long userId);
+    List<Timeline> findAllByUserId(Long userId);
     List<Timeline> findByTweetsTweetId(String tweetId);
 }

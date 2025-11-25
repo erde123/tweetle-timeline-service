@@ -49,18 +49,20 @@ class TimelineServiceTest {
 
     @Test
     void getTimeline_WhenExists_ShouldReturnTimeline() {
-        when(timelineRepository.findByUserId(100L)).thenReturn(existingTimeline);
+        when(timelineRepository.findAllByUserId(100L)).thenReturn(List.of(existingTimeline));
+        when(timelineRepository.save(any(Timeline.class))).thenAnswer(i -> i.getArgument(0));
 
         Timeline result = timelineService.getTimeline(100L);
 
         assertNotNull(result);
         assertEquals(100L, result.getUserId());
-        verify(timelineRepository, times(1)).findByUserId(100L);
+        verify(timelineRepository, times(1)).findAllByUserId(100L);
+        verify(timelineRepository, times(1)).save(existingTimeline);
     }
 
     @Test
     void addTweetToTimeline_WhenTimelineExists_ShouldAddTweet() {
-        when(timelineRepository.findByUserId(100L)).thenReturn(existingTimeline);
+        when(timelineRepository.findAllByUserId(100L)).thenReturn(List.of(existingTimeline));
         when(timelineRepository.save(any(Timeline.class))).thenAnswer(i -> i.getArgument(0));
 
         Timeline result = timelineService.addTweetToTimeline(100L, "tweet123", 200L);
@@ -68,12 +70,12 @@ class TimelineServiceTest {
         assertEquals(1, result.getTweets().size());
         assertEquals("tweet123", result.getTweets().get(0).getTweetId());
         assertEquals(200L, result.getTweets().get(0).getAuthorId());
-        verify(timelineRepository, times(1)).save(any(Timeline.class));
+        verify(timelineRepository, times(2)).save(any(Timeline.class));
     }
 
     @Test
     void addTweetToTimeline_WhenTimelineDoesNotExist_ShouldCreateNewTimeline() {
-        when(timelineRepository.findByUserId(300L)).thenReturn(null);
+        when(timelineRepository.findAllByUserId(300L)).thenReturn(new ArrayList<>());
         when(timelineRepository.save(any(Timeline.class))).thenAnswer(i -> i.getArgument(0));
 
         Timeline result = timelineService.addTweetToTimeline(300L, "tweet999", 500L);
@@ -81,7 +83,7 @@ class TimelineServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTweets().size());
         assertEquals("tweet999", result.getTweets().get(0).getTweetId());
-        verify(timelineRepository, times(1)).save(any(Timeline.class));
+        verify(timelineRepository, times(2)).save(any(Timeline.class));
     }
 
     @Test
@@ -95,13 +97,13 @@ class TimelineServiceTest {
                     .build());
         }
 
-        when(timelineRepository.findByUserId(100L)).thenReturn(existingTimeline);
+        when(timelineRepository.findAllByUserId(100L)).thenReturn(List.of(existingTimeline));
         when(timelineRepository.save(any(Timeline.class))).thenAnswer(i -> i.getArgument(0));
 
         Timeline result = timelineService.addTweetToTimeline(100L, "newTweet", 300L);
 
         assertEquals(100, result.getTweets().size());
-        verify(timelineRepository, times(1)).save(any(Timeline.class));
+        verify(timelineRepository, times(2)).save(any(Timeline.class));
     }
 
     @Test
