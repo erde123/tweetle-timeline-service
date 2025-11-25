@@ -37,3 +37,12 @@ spring:
 rabbitmq:
   exchange:
     name: tweetle.exchange
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  endpoint:
+    prometheus:
+      enabled: true
