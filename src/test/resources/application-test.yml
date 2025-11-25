@@ -1,0 +1,11 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+      direct:
+        auto-startup: false
