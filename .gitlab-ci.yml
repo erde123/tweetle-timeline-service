@@ -4,6 +4,7 @@ variables:
 stages:
   - build
   - test
+  - security
   - sonarqube-check
   - deploy
 
@@ -26,6 +27,35 @@ sonarqube-check:
   stage: sonarqube-check
   script:
     - ./gradlew test jacocoTestReport sonar
+
+zap-security-scan:
+  stage: security
+  image: zaproxy/zap-weekly
+  dependencies:
+    - build
+  script:
+    # Start your app using docker compose (silent mode)
+    - docker compose down || true
+    - docker compose up -d --build
+
+    # Wait for Spring Boot to be fully available
+    - echo "Waiting for Spring Boot to start..."
+    - sleep 25
+
+    # ZAP target URL — update port if your app != 8080
+    - export TARGET_URL="http://host.docker.internal:8080"
+
+    # Run baseline scan
+    - mkdir -p zap-reports
+    - zap-baseline.py -t "$TARGET_URL" -r zap-report.html -J zap-report.json || true
+
+  artifacts:
+    paths:
+      - zap-report.html
+      - zap-report.json
+    reports:
+      dast: zap-report.json
+    expire_in: 1 week
 
 docker-deploy:
   stage: deploy
