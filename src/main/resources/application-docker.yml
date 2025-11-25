@@ -16,7 +16,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://admin:password@timeline-mongo:27018/timelinedb?authSource=admin
+      uri: mongodb://admin:password@timeline-mongo:27017/timelinedb?authSource=admin
       database: timelinedb
       username: admin
       password: password
