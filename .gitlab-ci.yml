@@ -23,11 +23,6 @@ test:
   script:
     - ./gradlew test
 
-sonarqube-check:
-  stage: sonarqube-check
-  script:
-    - ./gradlew test jacocoTestReport sonar
-
 zap-security-scan:
   stage: security
   dependencies:
@@ -59,6 +54,10 @@ zap-security-scan:
       - zap-reports/zap-report.json
     expire_in: 1 week
 
+sonarqube-check:
+  stage: sonarqube-check
+  script:
+    - ./gradlew test jacocoTestReport sonar
 
 docker-deploy:
   stage: deploy
