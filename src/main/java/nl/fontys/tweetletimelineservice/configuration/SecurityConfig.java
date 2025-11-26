@@ -20,7 +20,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/timeline/v3/api-docs").permitAll()
                         .requestMatchers("/api/timeline/**").authenticated()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll()
+                )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .build();
     }
